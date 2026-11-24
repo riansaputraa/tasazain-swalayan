@@ -197,6 +197,7 @@ export default function PosCashierView({ user }) {
       setCart([]);
 
       // Reload products to refresh stock counts
+      window.dispatchEvent(new CustomEvent('stock:updated'));
       await loadData();
     } catch (err) {
       setPaymentError(err.message || 'Gagal menyimpan transaksi');

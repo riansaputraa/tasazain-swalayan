@@ -91,6 +91,7 @@ export default function ProductsView() {
     if (confirm(`Yakin ingin menghapus produk "${name}"?`)) {
       try {
         await api.deleteProduct(id);
+        window.dispatchEvent(new CustomEvent('stock:updated'));
         await loadData();
       } catch (err) {
         alert(err.message || 'Gagal menghapus produk');
@@ -110,6 +111,7 @@ export default function ProductsView() {
         await api.createProduct(formData);
       }
       setShowModal(false);
+      window.dispatchEvent(new CustomEvent('stock:updated'));
       await loadData();
     } catch (err) {
       setErrorMsg(err.message || 'Gagal menyimpan produk');

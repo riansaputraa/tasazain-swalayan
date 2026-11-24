@@ -27,7 +27,7 @@ class PurchaseController extends Controller
     {
         $request->validate([
             'supplier_id'    => 'required|exists:suppliers,id',
-            'purchase_date'  => 'required|date',
+            'purchase_date'  => 'nullable|date',
             'invoice_number' => 'required|string|unique:purchases,invoice_number',
             'notes'          => 'nullable|string',
             'items'          => 'required|array|min:1',
@@ -39,6 +39,7 @@ class PurchaseController extends Controller
         DB::beginTransaction();
         try {
             $totalAmount = 0;
+            $purchaseDate = $request->purchase_date ?: now()->toDateString();
 
             // Hitung subtotal tiap item
             $items = collect($request->items)->map(function ($item) use (&$totalAmount) {
@@ -52,7 +53,7 @@ class PurchaseController extends Controller
                 'supplier_id'    => $request->supplier_id,
                 'user_id'        => $request->user()->id,
                 'invoice_number' => $request->invoice_number,
-                'purchase_date'  => $request->purchase_date,
+                'purchase_date'  => $purchaseDate,
                 'total_amount'   => $totalAmount,
                 'notes'          => $request->notes,
             ]);
@@ -81,7 +82,7 @@ class PurchaseController extends Controller
                 'source_id'        => $purchase->id,
                 'amount'           => $totalAmount,
                 'description'      => 'Kulakan dari ' . optional($purchase->supplier)->name,
-                'transaction_date' => $request->purchase_date,
+                'transaction_date' => $purchaseDate,
                 'balance_after'    => $lastBalance - $totalAmount,
             ]);
 

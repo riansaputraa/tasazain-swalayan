@@ -14,6 +14,7 @@ export default function App() {
   const [user, setUser] = useState(getStoredUser());
   const [currentView, setCurrentView] = useState('dashboard');
   const [lowStockCount, setLowStockCount] = useState(0);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
 
   // Check auth and fetch low stock count
   const checkInitialStatus = async () => {
@@ -22,7 +23,9 @@ export default function App() {
 
     try {
       const res = await api.getLowStockProducts();
-      setLowStockCount(res?.length || 0);
+      const list = Array.isArray(res) ? res : (res?.data || []);
+      setLowStockProducts(list);
+      setLowStockCount(list.length);
     } catch (err) {
       console.error('Error fetching low stock status:', err);
     }
@@ -32,13 +35,32 @@ export default function App() {
     if (user) {
       checkInitialStatus();
     }
+  }, [user, currentView]);
 
+  useEffect(() => {
     const handleUnauthorized = () => {
       setUser(null);
     };
+    const handleStockUpdated = () => {
+      checkInitialStatus();
+    };
+
     window.addEventListener('auth:unauthorized', handleUnauthorized);
-    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
-  }, [user]);
+    window.addEventListener('stock:updated', handleStockUpdated);
+
+    // Poll every 15 seconds to ensure notification count is always fresh
+    const pollTimer = setInterval(() => {
+      if (getAuthToken()) {
+        checkInitialStatus();
+      }
+    }, 15000);
+
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+      window.removeEventListener('stock:updated', handleStockUpdated);
+      clearInterval(pollTimer);
+    };
+  }, []);
 
   const handleLoginSuccess = (loggedInUser) => {
     setUser(loggedInUser);
@@ -73,6 +95,8 @@ export default function App() {
           currentView={currentView}
           setCurrentView={setCurrentView}
           lowStockCount={lowStockCount}
+          lowStockProducts={lowStockProducts}
+          onRefreshStock={checkInitialStatus}
           onOpenNewSale={() => setCurrentView('pos')}
         />
 

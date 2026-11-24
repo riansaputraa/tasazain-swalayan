@@ -11,6 +11,7 @@ export default function RestockView() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
   const [orderItems, setOrderItems] = useState([
     { product_id: '', quantity: 10, buy_price: 0, subtotal: 0 },
@@ -131,6 +132,7 @@ export default function RestockView() {
   const openOrderModal = () => {
     setSelectedSupplier(suppliers[0]?.id || '');
     setInvoiceNumber('PO-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.floor(100 + Math.random() * 900));
+    setPurchaseDate(new Date().toISOString().slice(0, 10));
     setNotes('Kulakan barang dagangan swalayan');
     setOrderItems([
       { product_id: products[0]?.id || '', quantity: 10, buy_price: Number(products[0]?.buy_price) || 0, subtotal: (Number(products[0]?.buy_price) || 0) * 10 },
@@ -211,6 +213,7 @@ export default function RestockView() {
     try {
       const payload = {
         supplier_id: selectedSupplier,
+        purchase_date: purchaseDate || new Date().toISOString().slice(0, 10),
         invoice_number: invoiceNumber,
         notes: notes,
         items: orderItems.map((it) => ({
@@ -222,6 +225,7 @@ export default function RestockView() {
 
       await api.createPurchase(payload);
       setShowModal(false);
+      window.dispatchEvent(new CustomEvent('stock:updated'));
       await loadData();
     } catch (err) {
       setErrorMsg(err.message || 'Gagal menyimpan transaksi kulakan');
@@ -459,7 +463,7 @@ export default function RestockView() {
             )}
 
             <form onSubmit={handleSubmitOrder} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
                     Pilih Distributor / Supplier
@@ -479,6 +483,19 @@ export default function RestockView() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                    Tanggal Kulakan
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={purchaseDate}
+                    onChange={(e) => setPurchaseDate(e.target.value)}
+                    className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-white/30"
+                  />
                 </div>
 
                 <div>
