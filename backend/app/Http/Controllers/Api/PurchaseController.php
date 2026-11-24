@@ -13,7 +13,7 @@ class PurchaseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Purchase::with(['supplier', 'user'])
+        $query = Purchase::with(['supplier', 'user', 'items.product'])
             ->orderByDesc('purchase_date');
 
         if ($request->start_date && $request->end_date) {

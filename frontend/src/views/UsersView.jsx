@@ -9,7 +9,7 @@ export default function UsersView() {
     setLoading(true);
     try {
       const res = await api.getUsers();
-      setUsers(res || []);
+      setUsers(Array.isArray(res) ? res : (res?.data || []));
     } catch (err) {
       console.error('Error loading users:', err);
     } finally {

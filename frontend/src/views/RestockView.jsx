@@ -26,9 +26,13 @@ export default function RestockView() {
         api.getSuppliers(),
         api.getPosProducts(),
       ]);
-      setPurchases(purchRes || []);
-      setSuppliers(suppRes || []);
-      setProducts(prodRes || []);
+      const purchList = Array.isArray(purchRes) ? purchRes : (purchRes?.data || []);
+      const suppList = Array.isArray(suppRes) ? suppRes : (suppRes?.data || []);
+      const prodList = Array.isArray(prodRes) ? prodRes : (prodRes?.data || []);
+
+      setPurchases(purchList);
+      setSuppliers(suppList);
+      setProducts(prodList);
     } catch (err) {
       console.error('Error loading restock data:', err);
     } finally {
@@ -225,7 +229,7 @@ export default function RestockView() {
                     Memuat riwayat kulakan...
                   </td>
                 </tr>
-              ) : purchases.length === 0 ? (
+              ) : !Array.isArray(purchases) || purchases.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="py-12 text-center text-zinc-500">
                     Belum ada riwayat kulakan barang. Klik "+ Buat Kulakan Baru" untuk menambah stok.
