@@ -15,6 +15,7 @@ export default function UsersView() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -40,6 +41,7 @@ export default function UsersView() {
       role: 'kasir',
     });
     setErrorMsg('');
+    setShowPassword(false);
     setShowModal(true);
   };
 
@@ -242,15 +244,27 @@ export default function UsersView() {
                 <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
                   Password (Minimal 6 Karakter)
                 </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/30"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full bg-[#181920] border border-white/10 rounded-xl pl-3 pr-10 py-2 text-xs text-white focus:outline-none focus:border-white/30 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1 flex items-center justify-center"
+                    title={showPassword ? 'Sembunyikan password' : 'Lihat password'}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPassword ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                </div>
               </div>
 
               <div>
