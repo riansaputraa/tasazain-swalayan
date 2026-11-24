@@ -25,10 +25,13 @@ class ExpenseController extends Controller
         $data = $request->validate([
             'description'  => 'required|string|max:255',
             'amount'       => 'required|numeric|min:1',
-            'expense_date' => 'required|date',
-            'category'     => 'in:operasional,lain-lain',
+            'expense_date' => 'nullable|date',
+            'category'     => 'nullable|string|max:100',
             'notes'        => 'nullable|string',
         ]);
+
+        $data['expense_date'] = $data['expense_date'] ?? today()->toDateString();
+        $data['category']     = $data['category'] ?? 'Operasional';
 
         $expense = Expense::create(array_merge($data, ['user_id' => $request->user()->id]));
 

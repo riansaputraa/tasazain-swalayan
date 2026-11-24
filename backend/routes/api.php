@@ -55,8 +55,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin only: manage users
     Route::middleware('admin')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/users', [AuthController::class, 'register']);
         Route::get('/users', function () {
-            return response()->json(\App\Models\User::select('id', 'name', 'email', 'role', 'created_at')->get());
+            return response()->json(\App\Models\User::select('id', 'name', 'email', 'role', 'created_at')->orderBy('id')->get());
+        });
+        Route::delete('/users/{user}', function (\App\Models\User $user, \Illuminate\Http\Request $request) {
+            if ($user->id === $request->user()->id) {
+                return response()->json(['message' => 'Tidak dapat menghapus akun Anda sendiri yang sedang aktif.'], 422);
+            }
+            $user->delete();
+            return response()->json(['message' => 'Pengguna berhasil dihapus.']);
         });
     });
 });
