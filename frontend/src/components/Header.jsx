@@ -63,19 +63,6 @@ export default function Header({ currentView, setCurrentView, lowStockCount = 0,
             </span>
           )}
         </button>
-
-        {/* Quick action button: New Transaction */}
-        <button
-          type="button"
-          onClick={() => {
-            setCurrentView('pos');
-            if (onOpenNewSale) onOpenNewSale();
-          }}
-          className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-lg text-xs font-bold transition-all active:scale-[0.98] border border-white shadow-md shadow-white/5"
-        >
-          <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
-          <span>+ Transaksi Kasir</span>
-        </button>
       </div>
     </header>
   );

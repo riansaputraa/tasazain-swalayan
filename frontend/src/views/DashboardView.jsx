@@ -62,13 +62,6 @@ export default function DashboardView({ setCurrentView }) {
             <span className="material-symbols-outlined text-[17px]">refresh</span>
             <span>Segarkan</span>
           </button>
-          <button
-            onClick={() => setCurrentView('pos')}
-            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-lg text-xs font-bold transition-all border border-white"
-          >
-            <span className="material-symbols-outlined text-[17px]">point_of_sale</span>
-            <span>Buka Kasir POS</span>
-          </button>
         </div>
       </div>
 
