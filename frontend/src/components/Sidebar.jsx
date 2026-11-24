@@ -18,9 +18,11 @@ export default function Sidebar({ currentView, setCurrentView, user, onLogout })
         {/* Brand Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-[22px]">storefront</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Tasazain Logo"
+              className="w-9 h-9 rounded-lg object-contain shadow-sm drop-shadow"
+            />
             <div className="flex flex-col">
               <span className="font-bold text-white text-[15px] tracking-tight">Tasazain Swalayan</span>
               <span className="text-[11px] text-zinc-400 font-medium">Enterprise Retail POS</span>

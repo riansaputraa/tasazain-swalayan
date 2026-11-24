@@ -603,6 +603,11 @@ export default function PosCashierView({ user }) {
           <div className="w-full max-w-sm bg-white text-black rounded-2xl shadow-2xl p-6 font-mono text-xs flex flex-col gap-4">
             {/* Receipt Header */}
             <div className="text-center pb-3 border-b border-dashed border-zinc-400">
+              <img
+                src="/logo.png"
+                alt="Tasazain Logo"
+                className="w-10 h-10 mx-auto mb-2 object-contain"
+              />
               <h2 className="text-base font-extrabold uppercase tracking-tight">TASAZAIN SWALAYAN</h2>
               <p className="text-[11px] text-zinc-600">Tasazain Retail Enterprise</p>
               <p className="text-[10px] text-zinc-500">Jl. Raya Sukolilo No. 1, Surabaya</p>

@@ -39,9 +39,11 @@ export default function LoginView({ onLoginSuccess }) {
       <div className="relative w-full max-w-md bg-[#141519] border border-white/10 rounded-2xl shadow-2xl p-8 backdrop-blur-xl">
         {/* Brand */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white mb-3 shadow-lg">
-            <span className="material-symbols-outlined text-[32px]">storefront</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Tasazain Logo"
+            className="w-16 h-16 rounded-2xl object-contain mb-3 drop-shadow-xl"
+          />
           <h1 className="text-2xl font-bold tracking-tight text-white font-display">
             Tasazain Swalayan
           </h1>
