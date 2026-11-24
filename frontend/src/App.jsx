@@ -45,8 +45,14 @@ export default function App() {
       checkInitialStatus();
     };
 
+    const handleUserUpdated = () => {
+      const u = getStoredUser();
+      if (u) setUser(u);
+    };
+
     window.addEventListener('auth:unauthorized', handleUnauthorized);
     window.addEventListener('stock:updated', handleStockUpdated);
+    window.addEventListener('user:updated', handleUserUpdated);
 
     // Poll every 15 seconds to ensure notification count is always fresh
     const pollTimer = setInterval(() => {
@@ -58,6 +64,7 @@ export default function App() {
     return () => {
       window.removeEventListener('auth:unauthorized', handleUnauthorized);
       window.removeEventListener('stock:updated', handleStockUpdated);
+      window.removeEventListener('user:updated', handleUserUpdated);
       clearInterval(pollTimer);
     };
   }, []);

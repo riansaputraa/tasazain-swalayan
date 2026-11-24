@@ -43,7 +43,8 @@ async function request(endpoint, options = {}) {
       // Optional event or redirect
       window.dispatchEvent(new Event('auth:unauthorized'));
     }
-    const errorMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Terjadi kesalahan sistem');
+    const validationMsg = data.errors ? Object.values(data.errors).flat().join(', ') : null;
+    const errorMsg = validationMsg || data.message || 'Terjadi kesalahan sistem';
     throw new Error(errorMsg);
   }
 
@@ -122,5 +123,6 @@ export const api = {
   // Users
   getUsers: () => request('/users'),
   createUser: (data) => request('/users', { method: 'POST', body: JSON.stringify(data) }),
+  updateUser: (id, data) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
 };
