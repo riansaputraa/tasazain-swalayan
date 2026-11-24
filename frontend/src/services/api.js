@@ -95,6 +95,8 @@ export const api = {
   // Suppliers
   getSuppliers: () => request('/suppliers'),
   createSupplier: (data) => request('/suppliers', { method: 'POST', body: JSON.stringify(data) }),
+  updateSupplier: (id, data) => request(`/suppliers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteSupplier: (id) => request(`/suppliers/${id}`, { method: 'DELETE' }),
 
   // Sales (POS)
   getSales: () => request('/sales'),

@@ -18,6 +18,82 @@ export default function RestockView() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Add & Edit Supplier Modal
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState(null);
+  const [supplierForm, setSupplierForm] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    email: '',
+  });
+  const [savingSupplier, setSavingSupplier] = useState(false);
+  const [supplierError, setSupplierError] = useState('');
+
+  const handleOpenSupplierModal = () => {
+    setEditingSupplier(null);
+    setSupplierForm({
+      name: '',
+      phone: '',
+      address: '',
+      email: '',
+    });
+    setSupplierError('');
+    setShowSupplierModal(true);
+  };
+
+  const handleEditSupplier = (supplier) => {
+    setEditingSupplier(supplier);
+    setSupplierForm({
+      name: supplier.name || '',
+      phone: supplier.phone || '',
+      address: supplier.address || '',
+      email: supplier.email || '',
+    });
+    setSupplierError('');
+    setShowSupplierModal(true);
+  };
+
+  const handleSaveSupplier = async (e) => {
+    e.preventDefault();
+    setSavingSupplier(true);
+    setSupplierError('');
+
+    try {
+      if (editingSupplier) {
+        await api.updateSupplier(editingSupplier.id, supplierForm);
+      } else {
+        const created = await api.createSupplier(supplierForm);
+        if (created?.id) {
+          setSelectedSupplier(created.id);
+        }
+      }
+      setShowSupplierModal(false);
+      const suppRes = await api.getSuppliers();
+      const suppList = Array.isArray(suppRes) ? suppRes : (suppRes?.data || []);
+      setSuppliers(suppList);
+    } catch (err) {
+      setSupplierError(err.message || 'Gagal menyimpan data distributor');
+    } finally {
+      setSavingSupplier(false);
+    }
+  };
+
+  const handleDeleteSupplier = async (id, name) => {
+    if (!window.confirm(`Hapus distributor "${name}"?`)) return;
+    try {
+      await api.deleteSupplier(id);
+      const suppRes = await api.getSuppliers();
+      const suppList = Array.isArray(suppRes) ? suppRes : (suppRes?.data || []);
+      setSuppliers(suppList);
+      if (selectedSupplier === id && suppList.length > 0) {
+        setSelectedSupplier(suppList[0].id);
+      }
+    } catch (err) {
+      alert(err.message || 'Gagal menghapus distributor');
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -169,6 +245,13 @@ export default function RestockView() {
 
         <div className="flex items-center gap-3">
           <button
+            onClick={handleOpenSupplierModal}
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#181920] hover:bg-white/10 text-zinc-200 hover:text-white rounded-xl text-xs font-semibold transition-all border border-white/10 shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">domain_add</span>
+            <span>+ Tambah Distributor</span>
+          </button>
+          <button
             onClick={openOrderModal}
             className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-bold transition-all border border-white shadow-md shadow-white/5"
           >
@@ -178,22 +261,103 @@ export default function RestockView() {
         </div>
       </div>
 
-      {/* Supplier List Pills */}
-      <div className="p-4 rounded-2xl bg-[#141519] border border-white/10 flex items-center justify-between overflow-x-auto gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            Distributor Rekanan:
-          </span>
-          <div className="flex items-center gap-2">
-            {suppliers.map((s) => (
-              <span
-                key={s.id}
-                className="px-3 py-1 rounded-lg bg-[#181920] border border-white/10 text-xs text-zinc-300 font-medium"
-              >
-                {s.name} <span className="text-zinc-500">({s.phone})</span>
-              </span>
-            ))}
+      {/* Distributor Rekanan List Table */}
+      <div className="rounded-2xl bg-[#141519] border border-white/10 overflow-hidden">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
+              <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-white">Daftar Distributor Rekanan</h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-zinc-300 font-mono">
+                  {suppliers.length} Distributor
+                </span>
+              </div>
+              <p className="text-[11px] text-zinc-400">Pemasok grosir untuk kulakan & stok barang swalayan</p>
+            </div>
           </div>
+
+          <button
+            onClick={handleOpenSupplierModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all border border-white/10"
+          >
+            <span className="material-symbols-outlined text-[16px]">domain_add</span>
+            <span>+ Tambah Distributor</span>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-white/10 bg-[#181920]/60 text-zinc-400 uppercase tracking-wider font-semibold">
+                <th className="py-3 px-4">Nama Distributor</th>
+                <th className="py-3 px-4">No. Telepon / WA</th>
+                <th className="py-3 px-4">Email</th>
+                <th className="py-3 px-4">Alamat Kantor / Gudang</th>
+                <th className="py-3 px-4 text-center w-20">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 font-sans">
+              {suppliers.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-8 text-center text-zinc-500">
+                    Belum ada data distributor. Klik "+ Tambah Distributor" untuk mendaftarkan rekanan.
+                  </td>
+                </tr>
+              ) : (
+                suppliers.map((s) => (
+                  <tr key={s.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 px-4 font-semibold text-white">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center shrink-0 text-zinc-300">
+                          <span className="material-symbols-outlined text-[15px]">storefront</span>
+                        </div>
+                        <span>{s.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-zinc-300 font-mono">
+                      {s.phone ? (
+                        <span className="flex items-center gap-1.5 text-emerald-400">
+                          <span className="material-symbols-outlined text-[14px]">call</span>
+                          {s.phone}
+                        </span>
+                      ) : (
+                        <span className="text-zinc-600">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-zinc-400">
+                      {s.email || <span className="text-zinc-600">-</span>}
+                    </td>
+                    <td className="py-3 px-4 text-zinc-400">
+                      {s.address || <span className="text-zinc-600">-</span>}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          title={`Edit data ${s.name}`}
+                          onClick={() => handleEditSupplier(s)}
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          title={`Hapus ${s.name}`}
+                          onClick={() => handleDeleteSupplier(s.id, s.name)}
+                          className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -306,9 +470,12 @@ export default function RestockView() {
                     onChange={(e) => setSelectedSupplier(e.target.value)}
                     className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/30"
                   >
+                    {suppliers.length === 0 && (
+                      <option value="">Belum ada distributor terdaftar</option>
+                    )}
                     {suppliers.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.name}
+                        {s.name} {s.phone ? `(${s.phone})` : ''}
                       </option>
                     ))}
                   </select>
@@ -428,6 +595,114 @@ export default function RestockView() {
                     <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <span>Konfirmasi & Tambah Stok</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD SUPPLIER MODAL */}
+      {showSupplierModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#141519] border border-white/20 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-white">
+                  {editingSupplier ? 'edit_note' : 'domain_add'}
+                </span>
+                <h3 className="text-base font-bold text-white">
+                  {editingSupplier ? 'Edit Informasi Distributor' : 'Tambah Distributor Baru'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSupplierModal(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {supplierError && (
+              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">error</span>
+                <span>{supplierError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveSupplier} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Nama Perusahaan / Distributor <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: PT Indofood CBP, CV Sumber Rejeki"
+                  value={supplierForm.name}
+                  onChange={(e) => setSupplierForm({ ...supplierForm, name: e.target.value })}
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  No. Telepon / WhatsApp
+                </label>
+                <input
+                  type="text"
+                  placeholder="Contoh: 081234567890"
+                  value={supplierForm.phone}
+                  onChange={(e) => setSupplierForm({ ...supplierForm, phone: e.target.value })}
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Email Distributor (Opsional)
+                </label>
+                <input
+                  type="email"
+                  placeholder="Contoh: order@distributor.com"
+                  value={supplierForm.email}
+                  onChange={(e) => setSupplierForm({ ...supplierForm, email: e.target.value })}
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Alamat Kantor / Gudang (Opsional)
+                </label>
+                <textarea
+                  rows="2"
+                  placeholder="Contoh: Jl. Industri Rungkut No. 12, Surabaya"
+                  value={supplierForm.address}
+                  onChange={(e) => setSupplierForm({ ...supplierForm, address: e.target.value })}
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSupplierModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingSupplier}
+                  className="flex-1 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  {savingSupplier ? (
+                    <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <span>{editingSupplier ? 'Simpan Perubahan' : 'Simpan Distributor'}</span>
                   )}
                 </button>
               </div>
