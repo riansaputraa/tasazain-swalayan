@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard & Report
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/report/cashflow', [ReportController::class, 'cashFlow']);
+    Route::post('/report/capital', [ReportController::class, 'setInitialCapital']);
 
     // Products - Special endpoints dulu
     Route::get('/products/pos', [ProductController::class, 'forPos']);

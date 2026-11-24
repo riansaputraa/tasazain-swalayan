@@ -115,6 +115,7 @@ export const api = {
     const q = new URLSearchParams(params).toString();
     return request(`/report/cashflow${q ? `?${q}` : ''}`);
   },
+  setInitialCapital: (data) => request('/report/capital', { method: 'POST', body: JSON.stringify(data) }),
 
   // Users
   getUsers: () => request('/users'),

@@ -42,4 +42,33 @@ class ReportController extends Controller
             'data'       => $cashFlows,
         ]);
     }
+
+    public function setInitialCapital(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1000',
+            'notes'  => 'nullable|string',
+            'date'   => 'nullable|date',
+        ]);
+
+        $lastBalance = CashFlow::latest('id')->value('balance_after') ?? 0;
+        $amount = (float) $request->amount;
+        $date = $request->date ?? today()->toDateString();
+        $notes = $request->notes ?: 'Modal Awal Kas Toko (Setoran Usaha)';
+
+        $cashFlow = CashFlow::create([
+            'type'             => 'income',
+            'source_type'      => 'capital',
+            'source_id'        => 0,
+            'amount'           => $amount,
+            'description'      => $notes,
+            'transaction_date' => $date,
+            'balance_after'    => $lastBalance + $amount,
+        ]);
+
+        return response()->json([
+            'message'   => 'Modal awal berhasil dicatat ke buku kas toko.',
+            'cash_flow' => $cashFlow,
+        ], 201);
+    }
 }

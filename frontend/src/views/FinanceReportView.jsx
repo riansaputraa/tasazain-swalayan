@@ -23,6 +23,15 @@ export default function FinanceReportView() {
   });
   const [savingExpense, setSavingExpense] = useState(false);
 
+  // Modal Capital (Modal Awal) State
+  const [showCapitalModal, setShowCapitalModal] = useState(false);
+  const [capitalForm, setCapitalForm] = useState({
+    amount: '10000000',
+    notes: 'Modal Awal Kas Toko (Setoran Usaha)',
+    date: new Date().toISOString().slice(0, 10),
+  });
+  const [savingCapital, setSavingCapital] = useState(false);
+
   const loadReport = async () => {
     setLoading(true);
     try {
@@ -70,6 +79,23 @@ export default function FinanceReportView() {
     }
   };
 
+  const handleCreateCapital = async (e) => {
+    e.preventDefault();
+    setSavingCapital(true);
+    try {
+      await api.setInitialCapital({
+        ...capitalForm,
+        amount: Number(capitalForm.amount),
+      });
+      setShowCapitalModal(false);
+      await loadReport();
+    } catch (err) {
+      alert(err.message || 'Gagal mencatat modal awal');
+    } finally {
+      setSavingCapital(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {/* Header Toolbar */}
@@ -84,6 +110,14 @@ export default function FinanceReportView() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowCapitalModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[17px]">account_balance_wallet</span>
+            <span>+ Modal Awal Toko</span>
+          </button>
+
           <button
             onClick={() => setShowExpenseModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all"
@@ -237,8 +271,12 @@ export default function FinanceReportView() {
                         {cf.description}
                       </td>
                       <td className="py-3 px-4 text-zinc-400 font-mono text-[11px]">
-                        <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">
-                          {cf.source_type} #{cf.source_id}
+                        <span className={`px-2 py-0.5 rounded border ${
+                          cf.source_type === 'capital'
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 font-bold'
+                            : 'bg-white/5 border-white/10'
+                        }`}>
+                          {cf.source_type === 'capital' ? 'SETORAN MODAL' : `${cf.source_type} #${cf.source_id}`}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
@@ -364,6 +402,106 @@ export default function FinanceReportView() {
                     <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <span>Simpan Pengeluaran</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SETOR MODAL AWAL TOKO */}
+      {showCapitalModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#141519] border border-white/20 rounded-2xl shadow-2xl p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-emerald-400">account_balance_wallet</span>
+                <h3 className="text-base font-bold text-white">Setor Modal Awal Kas Toko</h3>
+              </div>
+              <button onClick={() => setShowCapitalModal(false)} className="text-zinc-400 hover:text-white">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-400">
+              Mencatat uang modal usaha pemilik toko ke buku kas agar saldo awal kas tidak minus saat digunakan untuk belanja kulakan awal atau biaya operasional.
+            </p>
+
+            <form onSubmit={handleCreateCapital} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Nominal Modal Awal (Rp)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1000"
+                  value={capitalForm.amount}
+                  onChange={(e) => setCapitalForm({ ...capitalForm, amount: e.target.value })}
+                  placeholder="10000000"
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-sm font-mono font-bold text-white focus:outline-none focus:border-white/30"
+                />
+
+                {/* Quick Chips */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {[2000000, 5000000, 10000000, 25000000, 50000000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setCapitalForm({ ...capitalForm, amount: String(amt) })}
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-zinc-300 transition-colors"
+                    >
+                      {formatRupiah(amt)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Tanggal Setoran Modal
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={capitalForm.date}
+                  onChange={(e) => setCapitalForm({ ...capitalForm, date: e.target.value })}
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/30 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-1 uppercase tracking-wider">
+                  Keterangan / Sumber Modal
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={capitalForm.notes}
+                  onChange={(e) => setCapitalForm({ ...capitalForm, notes: e.target.value })}
+                  placeholder="Contoh: Modal Awal Kas Usaha Pemilik"
+                  className="w-full bg-[#181920] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white/30"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowCapitalModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingCapital}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  {savingCapital ? (
+                    <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <span>Setor Modal Awal</span>
                   )}
                 </button>
               </div>
