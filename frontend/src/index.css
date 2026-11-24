@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas-bg: #0a0a0c;
+  --color-surface-sidebar: #0d0e12;
+  --color-surface-card: #141519;
+  --color-surface-container: #181920;
+  --color-surface-elevated: #21222b;
+  --color-surface-container-high: #272834;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-hairline: rgba(255, 255, 255, 0.12);
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #71717A;
+  --color-status-income: #10b981;
+  --color-status-income-dim: rgba(16, 185, 129, 0.12);
+  --color-status-expense: #f43f5e;
+  --color-status-expense-dim: rgba(244, 63, 94, 0.12);
+  --color-status-alert: #f59e0b;
+  --color-status-alert-dim: rgba(245, 158, 11, 0.12);
+  
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #0a0a0c;
+    color: #FFFFFF;
+    font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}

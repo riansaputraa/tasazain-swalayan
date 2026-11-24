@@ -1,0 +1,29 @@
+# Root gitignore for Tasazain Swalayan
+
+# Dependencies
+backend/vendor/
+frontend/node_modules/
+
+# Build artifacts
+frontend/dist/
+frontend/dist-ssr/
+
+# Environment files
+backend/.env
+backend/.env.backup
+backend/.env.production
+*.env.local
+
+# Logs and databases
+*.log
+backend/storage/*.key
+backend/storage/logs/
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
