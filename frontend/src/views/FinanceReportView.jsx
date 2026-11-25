@@ -32,6 +32,9 @@ export default function FinanceReportView() {
   });
   const [savingCapital, setSavingCapital] = useState(false);
 
+  // Modal Print Preview State
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+
   const loadReport = async () => {
     setLoading(true);
     try {
@@ -97,116 +100,10 @@ export default function FinanceReportView() {
   };
 
   const handlePrint = () => {
-    const printArea = document.getElementById('print-report-area');
-    if (!printArea) {
+    try {
       window.print();
-      return;
-    }
-
-    const existingIframe = document.getElementById('print-frame-isolated');
-    if (existingIframe) {
-      existingIframe.remove();
-    }
-
-    const iframe = document.createElement('iframe');
-    iframe.id = 'print-frame-isolated';
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title></title>
-          <style>
-            @page { size: A4 portrait; margin: 0 !important; }
-            * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color: #000000; }
-            html, body {
-              background: #ffffff !important;
-              color: #000000 !important;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-              font-size: 10px !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              line-height: 1.35;
-            }
-            .print-document-container {
-              background: #ffffff !important;
-              color: #000000 !important;
-              padding: 12mm 15mm !important;
-              width: 100% !important;
-            }
-            .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px double #000000; padding-bottom: 12px; margin-bottom: 14px; }
-            .print-header-logo { display: flex; align-items: center; gap: 14px; }
-            .print-header-logo img { width: 52px; height: 52px; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .print-header-company h1 { font-size: 18px; font-weight: 900; color: #000000; margin: 0 0 3px 0; letter-spacing: 0.8px; text-transform: uppercase; }
-            .print-header-company p { font-size: 9px; color: #333333; margin: 0; line-height: 1.35; }
-            .print-header-meta { text-align: right; }
-            .print-meta-card { display: inline-block; border: 1.2px solid #000000; background-color: #fafafa; padding: 5px 8px; text-align: left; }
-            .print-meta-card-title { font-size: 8px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #000000; border-bottom: 1px solid #000000; padding-bottom: 2px; margin-bottom: 3px; text-align: center; }
-            .print-meta-table { border-collapse: collapse; font-size: 8.5px; }
-            .print-meta-table td { padding: 1.5px 2px; border: none !important; color: #000000; }
-            .print-meta-table td.lbl { font-weight: 600; color: #444444; white-space: nowrap; width: 75px; }
-            .print-meta-table td.sep { font-weight: 700; color: #000000; text-align: center; width: 10px; padding: 0 2px; }
-            .print-meta-table td.val { font-weight: 700; text-align: left; white-space: nowrap; font-variant-numeric: tabular-nums; }
-            .print-title-banner { text-align: center; padding: 6px 0 8px 0; margin-bottom: 14px; border-bottom: 1.5px solid #000000; }
-            .print-main-title { font-size: 15px; font-weight: 900; color: #000000; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
-            .print-summary-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; border: 1.5px solid #000000; }
-            .print-summary-table th { background-color: #f4f4f4; border: 1px solid #000000; padding: 6px 8px; font-size: 8.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; color: #000000; }
-            .print-summary-table th.text-center, .print-summary-table td.text-center { text-align: center !important; }
-            .print-summary-table th.text-right, .print-summary-table td.text-right { text-align: right !important; }
-            .print-summary-table td { border: 1px solid #000000; padding: 6px 8px; font-size: 9.5px; color: #000000; }
-            .print-summary-table .val-cell { text-align: right !important; font-weight: 700; font-size: 10px; font-variant-numeric: tabular-nums; }
-            .print-section-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #000000; border-bottom: 1.5px solid #000000; padding-bottom: 3px; margin-bottom: 6px; }
-            .print-table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 20px; border: 1.5px solid #000000; }
-            .print-table thead tr { background-color: #f4f4f4; border-bottom: 1.5px solid #000000; }
-            .print-table thead th { padding: 6px 8px; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; text-align: left; color: #000000; border: 1px solid #000000; }
-            .print-table thead th.text-right, .print-table tbody td.text-right, .print-table tfoot td.text-right { text-align: right !important; }
-            .print-table thead th.text-center, .print-table tbody td.text-center, .print-table tfoot td.text-center { text-align: center !important; }
-            .print-table thead th.text-left, .print-table tbody td.text-left, .print-table tfoot td.text-left { text-align: left !important; }
-            .print-table tbody tr { border-bottom: 1px solid #000000; }
-            .print-table tbody td { padding: 5px 8px; color: #000000; vertical-align: middle; border: 1px solid #000000; font-variant-numeric: tabular-nums; }
-            .print-table tfoot tr { background: #f4f4f4; border-top: 1.5px solid #000000; border-bottom: 3px double #000000; }
-            .print-table tfoot td { padding: 6px 8px; font-weight: 800; color: #000000; font-size: 9.5px; border: 1px solid #000000; font-variant-numeric: tabular-nums; }
-            .print-footer { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; page-break-inside: avoid; }
-            .print-sign-box { text-align: center; padding: 0 10px; }
-            .print-sign-box .sign-city-date { font-size: 9.5px; color: #000000; margin: 0 0 4px 0; }
-            .print-sign-box .sign-role { font-size: 9.5px; font-weight: 700; color: #000000; margin: 0 0 55px 0; text-transform: uppercase; letter-spacing: 0.3px; }
-            .print-sign-box .sign-name { font-size: 10px; font-weight: 800; color: #000000; margin: 0; text-decoration: underline; text-underline-offset: 3px; }
-            .print-sign-box .sign-sub { font-size: 8.5px; color: #444444; margin: 2px 0 0 0; }
-            .print-legal { margin-top: 20px; padding-top: 8px; border-top: 1px dashed #000000; font-size: 8px; color: #444444; text-align: center; line-height: 1.35; page-break-inside: avoid; }
-            @media print {
-              .print-table tbody tr { page-break-inside: avoid; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-document-container">
-            ${printArea.innerHTML}
-          </div>
-        </body>
-      </html>
-    `);
-    doc.close();
-
-    const doPrint = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-
-    const logoImg = doc.querySelector('img');
-    if (logoImg && !logoImg.complete) {
-      logoImg.onload = () => setTimeout(doPrint, 150);
-      logoImg.onerror = () => setTimeout(doPrint, 150);
-    } else {
-      setTimeout(doPrint, 250);
+    } catch (err) {
+      console.error('Print error:', err);
     }
   };
 
@@ -408,29 +305,29 @@ export default function FinanceReportView() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             onClick={() => setShowCapitalModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#181920] hover:bg-[#21222b] text-zinc-200 border border-white/10 hover:border-white/20 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[17px]">account_balance_wallet</span>
-            <span>+ Modal Awal Toko</span>
+            <span className="material-symbols-outlined text-[17px] text-zinc-300">account_balance_wallet</span>
+            <span>+ Modal Awal</span>
           </button>
 
           <button
             onClick={() => setShowExpenseModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#181920] hover:bg-[#21222b] text-zinc-200 border border-white/10 hover:border-white/20 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[17px]">price_change</span>
-            <span>+ Catat Biaya Operasional</span>
+            <span className="material-symbols-outlined text-[17px] text-zinc-300">price_change</span>
+            <span>+ Biaya Operasional</span>
           </button>
 
           <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-bold transition-all border border-white shadow-sm cursor-pointer"
+            onClick={() => setShowPreviewModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-extrabold transition-all border border-white shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-[17px]">print</span>
-            <span>Cetak Laporan</span>
+            <span>Pratinjau & Cetak Laporan</span>
           </button>
         </div>
       </div>
@@ -441,12 +338,12 @@ export default function FinanceReportView() {
         <div className="p-5 rounded-2xl bg-[#141519] border border-white/10 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-zinc-400">Total Kas Masuk (Pemasukan)</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-white/10 text-white border border-white/15 flex items-center justify-center">
               <span className="material-symbols-outlined text-[18px]">south_west</span>
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl font-bold text-emerald-400 font-mono">
+            <div className="text-2xl font-bold text-white font-mono">
               {formatRupiah(reportData.summary.total_income)}
             </div>
             <span className="text-[11px] text-zinc-500 mt-1 block">
@@ -459,12 +356,12 @@ export default function FinanceReportView() {
         <div className="p-5 rounded-2xl bg-[#141519] border border-white/10 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-zinc-400">Total Kas Keluar (Pengeluaran)</span>
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-white/10 text-white border border-white/15 flex items-center justify-center">
               <span className="material-symbols-outlined text-[18px]">north_east</span>
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl font-bold text-rose-400 font-mono">
+            <div className="text-2xl font-bold text-white font-mono">
               {formatRupiah(reportData.summary.total_expense)}
             </div>
             <span className="text-[11px] text-zinc-500 mt-1 block">
@@ -477,12 +374,12 @@ export default function FinanceReportView() {
         <div className="p-5 rounded-2xl bg-[#141519] border border-white/10 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-zinc-400">Saldo Kas Toko Saat Ini</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-white/10 text-white border border-white/15 flex items-center justify-center">
               <span className="material-symbols-outlined text-[18px]">account_balance</span>
             </div>
           </div>
           <div className="mt-4">
-            <div className={`text-2xl font-bold font-mono ${reportData.summary.net_cash >= 0 ? 'text-white' : 'text-rose-400'}`}>
+            <div className="text-2xl font-bold font-mono text-white">
               {formatRupiah(reportData.summary.net_cash)}
             </div>
             <span className="text-[11px] text-zinc-500 mt-1 block">
@@ -576,7 +473,7 @@ export default function FinanceReportView() {
                       <td className="py-3 px-4 text-zinc-400 font-mono text-[11px]">
                         <span className={`px-2 py-0.5 rounded border ${
                           cf.source_type === 'capital'
-                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 font-bold'
+                            ? 'bg-white/15 text-white border-white/20 font-bold'
                             : 'bg-white/5 border-white/10'
                         }`}>
                           {cf.source_type === 'capital' ? 'SETORAN MODAL' : `${cf.source_type} #${cf.source_id}`}
@@ -586,8 +483,8 @@ export default function FinanceReportView() {
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             isIncome
-                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                              ? 'bg-white/15 text-white border border-white/20'
+                              : 'bg-zinc-800 text-zinc-300 border border-white/10'
                           }`}
                         >
                           {isIncome ? 'MASUK' : 'KELUAR'}
@@ -595,7 +492,7 @@ export default function FinanceReportView() {
                       </td>
                       <td
                         className={`py-3 px-4 text-right font-mono font-bold ${
-                          isIncome ? 'text-emerald-400' : 'text-rose-400'
+                          isIncome ? 'text-white' : 'text-zinc-300'
                         }`}
                       >
                         {isIncome ? '+' : '-'} {formatRupiah(cf.amount)}
@@ -618,7 +515,7 @@ export default function FinanceReportView() {
           <div className="w-full max-w-md bg-[#141519] border border-white/20 rounded-2xl shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-rose-400">payments</span>
+                <span className="material-symbols-outlined text-white">payments</span>
                 <h3 className="text-base font-bold text-white">Catat Pengeluaran Operasional</h3>
               </div>
               <button
@@ -699,10 +596,10 @@ export default function FinanceReportView() {
                 <button
                   type="submit"
                   disabled={savingExpense}
-                  className="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {savingExpense ? (
-                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <span>Simpan Pengeluaran</span>
                   )}
@@ -719,7 +616,7 @@ export default function FinanceReportView() {
           <div className="w-full max-w-md bg-[#141519] border border-white/20 rounded-2xl shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-emerald-400">account_balance_wallet</span>
+                <span className="material-symbols-outlined text-white">account_balance_wallet</span>
                 <h3 className="text-base font-bold text-white">Setor Modal Awal Kas Toko</h3>
               </div>
               <button onClick={() => setShowCapitalModal(false)} className="text-zinc-400 hover:text-white cursor-pointer">
@@ -799,7 +696,7 @@ export default function FinanceReportView() {
                 <button
                   type="submit"
                   disabled={savingCapital}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {savingCapital ? (
                     <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -809,6 +706,53 @@ export default function FinanceReportView() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PRATINJAU DOKUMEN CETAK LAPORAN */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-4xl bg-[#141519] border border-white/20 rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
+            <div className="p-3.5 sm:p-4 border-b border-white/10 bg-[#181920] flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[19px]">print</span>
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-white leading-tight truncate">
+                    Pratinjau Dokumen Cetak Laporan Keuangan
+                  </h3>
+                  <p className="text-[11px] text-zinc-400 truncate">
+                    Format resmi akuntansi pembukuan kas toko
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-extrabold transition-all shadow-md active:scale-[0.98] cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[16px]">print</span>
+                  <span>Cetak / Unduh PDF</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPreviewModal(false)}
+                  className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-[#0a0a0c] flex justify-center">
+              <div className="w-full max-w-[820px] bg-white text-black p-6 sm:p-10 rounded-xl shadow-2xl overflow-x-auto select-text font-sans">
+                {renderReportContent()}
+              </div>
+            </div>
           </div>
         </div>
       )}

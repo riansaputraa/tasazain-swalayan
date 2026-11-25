@@ -80,23 +80,30 @@ export default function App() {
     setUser(null);
   };
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // If unauthenticated, show luxury login view
   if (!user) {
     return <LoginView onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-white flex">
+    <div className="min-h-screen bg-[#0a0a0c] text-white flex w-full overflow-x-hidden">
       {/* Executive Sidebar */}
       <Sidebar
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          setCurrentView(view);
+          setMobileMenuOpen(false);
+        }}
         user={user}
         onLogout={handleLogout}
+        mobileOpen={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
-      <div className="pl-[260px] min-h-screen flex-1 flex flex-col bg-[#0a0a0c]">
+      <div className="pl-0 lg:pl-[270px] min-h-screen flex-1 flex flex-col bg-[#0a0a0c] w-full max-w-full overflow-x-hidden">
         {/* Executive Header */}
         <Header
           currentView={currentView}
@@ -105,10 +112,11 @@ export default function App() {
           lowStockProducts={lowStockProducts}
           onRefreshStock={checkInitialStatus}
           onOpenNewSale={() => setCurrentView('pos')}
+          onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
         />
 
         {/* Dynamic Page Views */}
-        <main className="w-full pt-20 px-6 pb-8 flex-1">
+        <main className="w-full pt-20 px-3 sm:px-6 pb-8 flex-1 max-w-full overflow-x-hidden">
           {currentView === 'dashboard' && <DashboardView setCurrentView={setCurrentView} />}
           {currentView === 'pos' && <PosCashierView user={user} />}
           {currentView === 'products' && <ProductsView />}

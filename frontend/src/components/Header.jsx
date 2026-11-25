@@ -7,6 +7,7 @@ export default function Header({
   lowStockProducts = [],
   onRefreshStock,
   onOpenNewSale,
+  onToggleMobileMenu,
 }) {
   const [timeStr, setTimeStr] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -17,7 +18,7 @@ export default function Header({
     const updateTime = () => {
       const now = new Date();
       const options = {
-        weekday: 'long',
+        weekday: 'short',
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -59,27 +60,37 @@ export default function Header({
   };
 
   const viewTitles = {
-    dashboard: 'Ikhtisar Toko & Ringkasan Finansial',
-    pos: 'Terminal Kasir POS Swalayan',
-    products: 'Inventori & Manajemen Katalog Produk',
-    restock: 'Restock Kulakan Supplier & Biaya Toko',
-    finance: 'Buku Kas & Laporan Finansial Toko',
-    users: 'Hak Akses & Manajemen Akun',
+    dashboard: 'Ikhtisar Toko & Finansial',
+    pos: 'Terminal Kasir POS',
+    products: 'Inventori & Katalog',
+    restock: 'Restock Kulakan & Biaya',
+    finance: 'Laporan Keuangan',
+    users: 'Kelola Pengguna',
   };
 
   return (
-    <header className="fixed top-0 left-[260px] right-0 h-16 bg-[#0d0e12]/95 backdrop-blur-md border-b border-white/10 z-40 px-6 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+    <header className="fixed top-0 left-0 lg:left-[270px] right-0 h-16 bg-[#0d0e12]/95 backdrop-blur-md border-b border-white/10 z-30 px-3 sm:px-6 flex items-center justify-between">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* Mobile Hamburger Menu Button */}
+        <button
+          type="button"
+          onClick={onToggleMobileMenu}
+          className="lg:hidden p-2 -ml-1 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center cursor-pointer shrink-0"
+          title="Buka Menu"
+        >
+          <span className="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+
+        <span className="hidden md:inline text-[11px] font-bold uppercase tracking-wider text-zinc-400 whitespace-nowrap">
           Enterprise Retail POS
         </span>
-        <span className="text-zinc-600 text-xs">/</span>
-        <span className="text-sm font-semibold text-white tracking-tight">
+        <span className="hidden md:inline text-zinc-600 text-xs">/</span>
+        <span className="text-xs sm:text-sm font-semibold text-white tracking-tight truncate">
           {viewTitles[currentView] || 'Sistem Operasional Retail'}
         </span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {/* Real-time Clock */}
         <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141519] border border-white/10 text-zinc-300 text-xs font-mono">
           <span className="material-symbols-outlined text-[15px] text-zinc-400">schedule</span>
@@ -94,11 +105,11 @@ export default function Header({
               handleManualRefresh();
             }}
             title={lowStockCount > 0 ? `${lowStockCount} Produk Hampir Habis!` : 'Semua Stok Aman'}
-            className="relative p-2 rounded-lg bg-[#141519] hover:bg-[#21222b] text-zinc-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
+            className="relative p-2 rounded-xl bg-[#141519] hover:bg-[#21222b] text-zinc-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[19px]">notifications</span>
             {lowStockCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-amber-500 text-black text-[10px] font-extrabold rounded-full flex items-center justify-center border border-zinc-900 shadow-sm animate-pulse">
+              <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-white text-black text-[10px] font-extrabold rounded-full flex items-center justify-center border border-zinc-900 shadow-sm">
                 {lowStockCount}
               </span>
             )}
@@ -106,7 +117,7 @@ export default function Header({
 
           {/* Notification Dropdown Panel */}
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-80 bg-[#141519] border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+            <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-[#141519] border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 animate-fade-in">
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-[#181920]/70">
                 <div className="flex items-center gap-2">
@@ -137,7 +148,7 @@ export default function Header({
               <div className="p-3 max-h-72 overflow-y-auto">
                 {lowStockCount === 0 ? (
                   <div className="p-4 text-center flex flex-col items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center">
                       <span className="material-symbols-outlined text-xl">check_circle</span>
                     </div>
                     <div>
@@ -151,14 +162,14 @@ export default function Header({
                         setCurrentView('products');
                         setShowDropdown(false);
                       }}
-                      className="mt-2 text-xs text-zinc-300 hover:text-white font-semibold underline underline-offset-2"
+                      className="mt-2 text-xs text-zinc-300 hover:text-white font-semibold underline underline-offset-2 cursor-pointer"
                     >
                       Buka Katalog Produk
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-amber-400 px-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-200 px-1">
                       <span>{lowStockCount} Produk Menipis</span>
                       <span className="text-[10px] text-zinc-400">Di bawah min. stok</span>
                     </div>
@@ -166,14 +177,14 @@ export default function Header({
                       {lowStockProducts.map((p) => (
                         <div
                           key={p.id}
-                          className="p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-colors flex items-center justify-between"
+                          className="p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/20 transition-colors flex items-center justify-between"
                         >
                           <div>
                             <p className="text-xs font-bold text-white line-clamp-1">{p.name}</p>
                             <p className="text-[10px] text-zinc-400">SKU: {p.sku}</p>
                           </div>
                           <div className="text-right">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-white/10 text-zinc-200 border border-white/15">
                               Sisa {p.stock}
                             </span>
                             <span className="block text-[9px] text-zinc-500 mt-0.5">
@@ -189,7 +200,7 @@ export default function Header({
                           setCurrentView('restock');
                           setShowDropdown(false);
                         }}
-                        className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+                        className="flex-1 py-2 bg-white hover:bg-zinc-200 text-black text-xs font-extrabold rounded-xl transition-all cursor-pointer text-center"
                       >
                         Order Kulakan Baru
                       </button>
@@ -200,6 +211,20 @@ export default function Header({
             </div>
           )}
         </div>
+
+        {/* Quick action button: New Transaction */}
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentView('pos');
+            if (onOpenNewSale) onOpenNewSale();
+          }}
+          className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-bold transition-all active:scale-[0.98] border border-white shadow-md shadow-white/5 cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
+          <span className="hidden sm:inline">+ Transaksi Kasir</span>
+          <span className="sm:hidden font-bold">Kasir</span>
+        </button>
       </div>
     </header>
   );
