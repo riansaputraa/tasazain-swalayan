@@ -72,8 +72,8 @@ export default function DashboardView({ setCurrentView }) {
         </div>
       </div>
 
-      {/* 4 Executive Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 3 Executive Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Income */}
         <div className="p-5 rounded-xl bg-[#141519] border border-white/10 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between">
@@ -126,30 +126,6 @@ export default function DashboardView({ setCurrentView }) {
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-[11px] text-zinc-400">
               <span className="text-zinc-300 font-semibold">Pemasukan dikurangi Pengeluaran</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Low Stock Alert */}
-        <div className="p-5 rounded-xl bg-[#141519] border border-white/10 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Peringatan Stok Menipis</span>
-            <div className="w-8 h-8 rounded-lg bg-white/10 text-white border border-white/15 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[18px]">warning</span>
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="text-2xl font-bold text-white font-mono">
-              {data.stats.low_stock_count} <span className="text-xs text-zinc-400 font-sans">SKU Perlu Restock</span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-2 text-[11px]">
-              <button
-                onClick={() => setCurrentView('products')}
-                className="text-zinc-400 hover:text-white hover:underline font-semibold flex items-center gap-1 cursor-pointer transition-colors"
-              >
-                <span>Lihat Katalog Stok</span>
-                <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
-              </button>
             </div>
           </div>
         </div>
