@@ -231,18 +231,18 @@ export default function FinanceReportView() {
                 return (
                   <tr key={cf.id || idx}>
                     <td className="text-center font-mono" style={{ fontSize: '8.5px' }}>{idx + 1}</td>
-                    <td className="text-center font-mono" style={{ fontSize: '8.5px' }}>{dateStr}</td>
-                    <td className="text-center font-mono" style={{ fontSize: '8.5px' }}>
+                    <td className="text-center font-mono whitespace-nowrap" style={{ fontSize: '8.5px' }}>{dateStr}</td>
+                    <td className="text-center font-mono whitespace-nowrap" style={{ fontSize: '8.5px' }}>
                       {cf.source_type === 'capital' ? 'MODAL' : `${cf.source_type?.toUpperCase()} #${cf.source_id}`}
                     </td>
-                    <td>{cf.description}</td>
-                    <td className={isIncome ? 'text-right font-mono' : 'text-center font-mono'}>
+                    <td className="leading-tight">{cf.description}</td>
+                    <td className={isIncome ? 'text-right font-mono whitespace-nowrap' : 'text-center font-mono'}>
                       {isIncome ? formatRupiah(cf.amount) : '-'}
                     </td>
-                    <td className={!isIncome ? 'text-right font-mono' : 'text-center font-mono'}>
+                    <td className={!isIncome ? 'text-right font-mono whitespace-nowrap' : 'text-center font-mono'}>
                       {!isIncome ? formatRupiah(cf.amount) : '-'}
                     </td>
-                    <td className="text-right font-mono" style={{ fontWeight: 'bold' }}>
+                    <td className="text-right font-mono whitespace-nowrap" style={{ fontWeight: 'bold' }}>
                       {formatRupiah(cf.balance_after)}
                     </td>
                   </tr>
@@ -252,16 +252,16 @@ export default function FinanceReportView() {
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan="4" className="text-right" style={{ letterSpacing: '0.5px', paddingRight: '12px' }}>
+              <td colSpan="4" className="text-right whitespace-nowrap" style={{ letterSpacing: '0.5px', paddingRight: '12px' }}>
                 JUMLAH TOTAL:
               </td>
-              <td className="text-right font-mono">
+              <td className="text-right font-mono whitespace-nowrap">
                 {formatRupiah(totalIncome)}
               </td>
-              <td className="text-right font-mono">
+              <td className="text-right font-mono whitespace-nowrap">
                 {formatRupiah(totalExpense)}
               </td>
-              <td className="text-right font-mono" style={{ fontSize: '10px' }}>
+              <td className="text-right font-mono whitespace-nowrap" style={{ fontSize: '10px' }}>
                 {formatRupiah(netCash)}
               </td>
             </tr>
@@ -712,28 +712,34 @@ export default function FinanceReportView() {
 
       {/* MODAL PRATINJAU DOKUMEN CETAK LAPORAN */}
       {showPreviewModal && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-4xl bg-[#141519] border border-white/20 rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
-            <div className="p-3.5 sm:p-4 border-b border-white/10 bg-[#181920] flex items-center justify-between gap-3 shrink-0">
-              <div className="flex items-center gap-2.5 min-w-0">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-1 sm:p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-5xl bg-[#141519] border border-white/20 rounded-2xl shadow-2xl flex flex-col h-[96vh] max-h-[96vh] overflow-hidden">
+            {/* Top Toolbar */}
+            <div className="p-3 sm:p-4 border-b border-white/10 bg-[#181920] flex items-center justify-between gap-2 shrink-0">
+              <div className="flex items-center gap-2 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[19px]">print</span>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-white leading-tight truncate">
-                    Pratinjau Dokumen Cetak Laporan Keuangan
-                  </h3>
-                  <p className="text-[11px] text-zinc-400 truncate">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-white leading-tight truncate">
+                      Pratinjau Dokumen Cetak Laporan Keuangan
+                    </h3>
+                    <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-mono text-zinc-300">
+                      Format A4
+                    </span>
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate">
                     Format resmi akuntansi pembukuan kas toko
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-extrabold transition-all shadow-md active:scale-[0.98] cursor-pointer"
+                  className="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-white hover:bg-zinc-200 text-black rounded-xl text-xs font-extrabold transition-all shadow-md active:scale-[0.98] cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[16px]">print</span>
                   <span>Cetak / Unduh PDF</span>
@@ -741,16 +747,31 @@ export default function FinanceReportView() {
                 <button
                   type="button"
                   onClick={() => setShowPreviewModal(false)}
-                  className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  title="Tutup Pratinjau"
                 >
                   <span className="material-symbols-outlined text-[20px]">close</span>
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-[#0a0a0c] flex justify-center">
-              <div className="w-full max-w-[820px] bg-white text-black p-6 sm:p-10 rounded-xl shadow-2xl overflow-x-auto select-text font-sans">
-                {renderReportContent()}
+            {/* Hint Banner on Mobile */}
+            <div className="sm:hidden px-3.5 py-1.5 bg-black/60 border-b border-white/5 text-[10px] text-zinc-400 flex items-center justify-between shrink-0">
+              <span className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px] text-zinc-300">swipe</span>
+                <span>Geser horizontal untuk melihat seluruh lembar PDF</span>
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-white/10 font-mono text-[9px] text-zinc-300">
+                Ukuran A4 Asli
+              </span>
+            </div>
+
+            {/* Scrollable Viewport with Fixed-Density A4 Paper Sheet */}
+            <div className="flex-1 overflow-x-auto overflow-y-auto p-2 sm:p-6 bg-[#0a0a0c] select-text">
+              <div className="min-w-fit flex justify-center py-2 sm:py-4">
+                <div className="print-document-container w-[780px] min-w-[780px] max-w-[780px] bg-white text-black p-8 sm:p-10 rounded-lg shadow-2xl shrink-0 font-sans border border-black/15">
+                  {renderReportContent()}
+                </div>
               </div>
             </div>
           </div>
